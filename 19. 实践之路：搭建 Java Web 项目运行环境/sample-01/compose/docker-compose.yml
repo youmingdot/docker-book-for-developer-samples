@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+
+  redis:
+    image: redis:3.2
+    volumes:
+      - ../redis/redis.conf:/etc/redis/redis.conf:ro
+      - ../redis/data:/data
+    command:
+      - redis-server
+      - /etc/redis/redis.conf
+    ports:
+     - 6379:6379
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - ../mysql/my.cnf:/etc/mysql/my.cnf:ro
+      - ../mysql/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    ports:
+      - 3306:3306
+
+  tomcat:
+    image: tomcat:8.5
+    volumes:
+      - ../app:/usr/local/tomcat/webapps/ROOT
+    ports:
+      - 80:8080
