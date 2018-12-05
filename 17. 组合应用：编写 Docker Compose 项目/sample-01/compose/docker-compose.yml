@@ -1,0 +1,58 @@
+version: "3"
+
+networks:
+  frontend:
+  backend:
+
+services:
+
+  redis:
+    image: redis:3.2
+    networks:
+      - backend
+    volumes:
+      - ../redis/redis.conf:/etc/redis/redis.conf:ro
+      - ../redis/data:/data
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    ports:
+      - "6379:6379"
+
+  mysql:
+    image: mysql:5.7
+    networks:
+      - backend
+    volumes:
+      - ../mysql/my.cnf:/etc/mysql/my.cnf:ro
+      - ../mysql/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    ports:
+      - "3306:3306"
+
+  phpfpm:
+    build: ./phpfpm
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - ../phpfpm/php.ini:/usr/local/etc/php/php.ini:ro
+      - ../phpfpm/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+      - ../phpfpm/php-fpm.d:/usr/local/etc/php-fpm.d:ro
+      - ../phpfpm/crontab:/etc/crontab:ro
+      - ../website:/website
+    depends_on:
+      - redis
+      - mysql
+  
+  nginx:
+    image: nginx:1.12
+    networks:
+      - frontend
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/conf.d:/etc/nginx/conf.d:ro
+      - ../website:/website
+    depends_on:
+      - phpfpm
+    ports:
+      - "80:80"
