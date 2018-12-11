@@ -1,0 +1,73 @@
+version: '3'
+
+networks:
+  esnet:
+
+services:
+
+  es-node-1:
+    image: elasticsearch:5.6.3
+    container_name: es-node-1
+    hostname: es-node-1
+    networks:
+      esnet:
+        aliases:
+          - es-node-1.search
+    volumes:
+      - ../es-node-1/elasticsearch.yml:/etc/elasticsearch/elasticsearch.yml:ro
+      - ../es-node-1/jvm.options:/etc/elasticsearch/jvm.options:ro
+      - ../es-node-1/log4j2.properties:/etc/elasticsearch/log4j2.properties:ro
+      - ../es-node-1/plugins/analysis-ik:/usr/share/elasticsearch/plugins/analysis-ik
+      - /var/lib/elasticsearch
+    ports:
+      - 9201:9200
+
+  es-node-2:
+    image: elasticsearch:5.6.3
+    container_name: es-node-2
+    hostname: es-node-2
+    networks:
+      esnet:
+        aliases:
+          - es-node-2.search
+    volumes:
+      - ../es-node-2/elasticsearch.yml:/etc/elasticsearch/elasticsearch.yml:ro
+      - ../es-node-2/jvm.options:/etc/elasticsearch/jvm.options:ro
+      - ../es-node-2/log4j2.properties:/etc/elasticsearch/log4j2.properties:ro
+      - ../es-node-2/plugins/analysis-ik:/usr/share/elasticsearch/plugins/analysis-ik
+      - /var/lib/elasticsearch
+    ports:
+      - 9202:9200
+
+  es-node-3:
+    image: elasticsearch:5.6.3
+    container_name: es-node-3
+    hostname: es-node-3
+    networks:
+      esnet:
+        aliases:
+          - es-node-3.search
+    volumes:
+      - ../es-node-3/elasticsearch.yml:/etc/elasticsearch/elasticsearch.yml:ro
+      - ../es-node-3/jvm.options:/etc/elasticsearch/jvm.options:ro
+      - ../es-node-3/log4j2.properties:/etc/elasticsearch/log4j2.properties:ro
+      - ../es-node-3/plugins/analysis-ik:/usr/share/elasticsearch/plugins/analysis-ik
+      - /var/lib/elasticsearch
+    ports:
+      - 9203:9200
+      
+  logstash:
+    build: logstash
+    container_name: logstash
+    hostname: logstash
+    networks:
+      esnet:
+        aliases:
+          - logstash.search
+    volumes:
+      - ../logstash/logstash.yml:/etc/logstash/logstash.yml:ro
+      - ../logstash/jvm.options:/etc/logstash/jvm.options:ro
+      - ../logstash/log4j2.properties:/etc/logstash/log4j2.properties:ro
+      - ../logstash/mysql.pass:/etc/logstash/mysql.pass:ro
+      - ../logstash/lib:/etc/logstash/lib
+      - /var/lib/logstash

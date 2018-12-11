@@ -1,0 +1,5 @@
+#!/bin/bash
+
+root=$(cd `dirname $0`; dirname `pwd`)
+
+docker-compose -p elasticsearch -f ${root}/compose/docker-compose.yml "$@"
